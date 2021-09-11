@@ -1,0 +1,815 @@
+import pygame
+from pygame import mixer
+
+
+pygame.init()
+
+fire_place = pygame.mixer.Sound("img/fire.mp3")
+step_wood_place = pygame.mixer.Sound("img/wood.mp3")
+open_place = pygame.mixer.Sound("img/open.mp3")
+sit_place = pygame.mixer.Sound("img/sit.mp3")
+sit_place.set_volume(0.25)
+
+fps = 1200
+clock = pygame.time.Clock()
+
+n_s = 0
+e_w = 0
+
+j = False
+pres_col = False
+axe_col = False
+bed_col = False
+furn_col = False
+hide = True
+have_axe = False
+have_key = False
+have_wood = False
+have_chicken = False
+
+jum = False
+
+animation = True
+direction = True
+animationop = True
+directionop = True
+allowed_to_moved = True
+allowed_to_mover = True
+allowed_to_moveu = True
+allowed_to_movel = True
+font30 = pygame.font.SysFont("Constantia", 30)
+
+e_to_interact = False
+fn_c = 0
+fn = 0
+fn_c_ = 0
+fn_2 = 0
+fn_c_2 = 0
+fna = 0
+fn_ca = 0
+fna2 = 0
+fn_ca2 = 0
+fna3 = 0
+fn_ca3 = 0
+
+fn_ = 0
+grey = ((155, 155, 155))
+
+screen = pygame.display.set_mode((1000, 1000))
+pygame.display.set_caption("game")
+
+def draw_text(text, font, color, x, y):
+    image = font.render(text, True, color)
+    screen.blit(image, (x, y))
+
+class Chair(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.x = x
+        self.y = y
+        self.image = pygame.image.load("img/chair.png")
+        self.rect = self.image.get_rect()
+        self.rect.center = [x, y]
+
+    def draw(self):
+
+        screen.blit(self.image, (self.x, self.y))
+
+class Couch(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.x = x
+        self.y = y
+        self.image = pygame.image.load("img/couch.png")
+        self.rect = self.image.get_rect()
+        self.rect.center = [x, y]
+
+    def draw(self):
+
+        screen.blit(self.image, (self.x, self.y))
+
+
+class Presses(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.x = x
+        self.y = y
+        self.image = pygame.image.load("img/presses.png")
+        self.rect = self.image.get_rect()
+        self.rect.center = [x, y]
+
+    def draw(self):
+
+        screen.blit(self.image, (self.x, self.y))
+
+class Wood_cutter(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.x = x
+        self.y = y
+        self.image = pygame.image.load("img/wood_with_axe.png")
+        self.rect = self.image.get_rect()
+        self.rect.center = [x, y]
+
+    def draw(self):
+
+        screen.blit(self.image, (self.x, self.y))
+
+class Bed(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.x = x
+        self.y = y
+        self.image = pygame.image.load("img/bed.png")
+        self.rect = self.image.get_rect()
+        self.rect.center = [x, y]
+
+    def draw(self):
+
+        screen.blit(self.image, (self.x, self.y))
+
+class FloorPlanks(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.x = x
+        self.y = y
+        self.image = pygame.image.load("img/floor(planks).png")
+        self.rect = self.image.get_rect()
+        self.rect.center = [x, y]
+
+    def draw(self):
+        screen.blit(self.image, (self.x, self.y))
+
+class Lamp(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.x = x
+        self.y = y
+        self.mouse = pygame.mouse.get_pos()
+        self.counter = 1
+        self.image = pygame.image.load(f"img/lamp{self.counter}.png")
+        self.image2 = pygame.image.load(f"img/dark_room.png")
+        self.rect = self.image.get_rect()
+        self.rect.center = [x, y]
+
+
+
+    def update(self):
+        if pygame.mouse.get_pressed()[0] == 1:
+            self.counter = 1
+            self.image = pygame.image.load(f"img/lamp{self.counter}.png")
+            screen.blit(self.image2, (0, 0))
+
+        else:
+
+            self.counter = 2
+            self.image = pygame.image.load(f"img/lamp{self.counter}.png")
+
+
+    def draw(self):
+
+        screen.blit(self.image, (self.x, self.y))
+
+
+
+class Grass(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.x = x
+        self.y = y
+        self.image = pygame.image.load("img/Ground(grass).png")
+        self.rect = self.image.get_rect()
+        self.rect.center = [x, y]
+
+    def draw(self):
+        screen.blit(self.image, (self.x, self.y))
+
+
+class Table(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.x = x
+        self.y = y
+        self.image = pygame.image.load("img/table.png")
+        self.rect = self.image.get_rect()
+        self.rect.center = [x, y]
+        self.rect.top = self.rect.top
+        self.rect.bottom = self.rect.bottom
+        self.rect.left = self.rect.left
+        self.rect.right = self.rect.right
+
+    def draw(self):
+        screen.blit(self.image, (self.x, self.y))
+
+class Fridge(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.x = x
+        self.y = y
+        self.image = pygame.image.load("img/freezer1.png")
+        self.mouse = pygame.mouse.get_pos()
+        self.rect = self.image.get_rect()
+        self.rect.center = [x, y]
+
+
+    def update(self):
+        global fn_ca2, fna2, have_chicken
+
+        if player.rect.colliderect(self) and have_key == True:
+
+                fn_ca2 += 5
+                if fna2 == 0:
+                    fn_ca2 += 5
+                    self.image = pygame.image.load("img/freezer1.png")
+                    open_place.play()
+                    screen.blit(self.image, (self.x, self.y))
+                    if fn_ca2 > 200:
+                        fna2 = 1
+
+
+
+                if fna2 == 1:
+                    fn_ca2 += 5
+                    self.image = pygame.image.load("img/freezer2.png")
+                    screen.blit(self.image, (self.x, self.y))
+                    if fn_ca2 > 400:
+                        fna2 = 2
+
+                if fna2 == 2:
+                    fn_ca2 += 5
+                    self.image = pygame.image.load("img/freezer3.png")
+                    fn_ca2 = 0
+                    have_chicken = True
+                    if fn_ca2 > 0:
+                        fna2 = 0
+
+    def draw(self):
+        screen.blit(self.image, (self.x, self.y))
+
+class Tree(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.x = x
+        self.y = y
+        self.image = pygame.image.load("img/Tree.png")
+        self.mouse = pygame.mouse.get_pos()
+        self.rect = self.image.get_rect()
+        self.rect.center = [x, y]
+
+
+    def update(self):
+        global fn_ca, fna, have_wood
+
+        if player.rect.colliderect(self) and have_axe == True:
+
+                fn_ca += 1
+                if fna == 0:
+                    fn_ca += 1
+                    self.image = pygame.image.load("img/Tree.png")
+                    screen.blit(self.image, (self.x, self.y))
+                    if fn_ca > 200:
+                        fna = 1
+
+
+
+                if fna == 1:
+                    fn_ca += 1
+                    self.image = pygame.image.load("img/log.png")
+                    screen.blit(self.image, (self.x, self.y))
+                    if fn_ca > 400:
+                        fna = 2
+
+                if fna == 2:
+                    fn_ca += 1
+                    self.image = pygame.image.load("img/empty.png")
+                    have_wood = True
+                    fn_ca = 0
+                    if fn_ca > 0:
+                        fna = 0
+
+
+    def draw(self):
+        screen.blit(self.image, (self.x, self.y))
+
+class JumpScare(pygame.sprite.Sprite):
+    def __init__(self, x, y, a_speed):
+        pygame.sprite.Sprite.__init__(self)
+        self.x = x
+        self.y = y
+        self.a_speed = a_speed
+        self.counter = 0
+        self.counter_image = 1
+        self.image = pygame.image.load("img/jumpscare1.png")
+        self.mouse = pygame.mouse.get_pos()
+        self.rect = self.image.get_rect()
+        self.rect.center = [x, y]
+
+
+    def update(self):
+        global fn_ca, fna, jum
+
+        if jum == True:
+            self.counter += self.a_speed
+            if self.counter <= 50 and self.counter >= 0:
+                self.counter_image = 1
+                self.image = pygame.image.load(f"img/jumpscare{self.counter_image}.png")
+                screen.blit(self.image, (self.x, self.y))
+            elif self.counter <= 100 and self.counter >= 50:
+                self.counter_image = 2
+                self.image = pygame.image.load(f"img/jumpscare{self.counter_image}.png")
+                screen.blit(self.image, (self.x, self.y))
+            elif self.counter <= 150 and self.counter >= 100:
+                self.counter_image = 3
+                self.image = pygame.image.load(f"img/jumpscare{self.counter_image}.png")
+                screen.blit(self.image, (self.x, self.y))
+            elif self.counter <= 200 and self.counter >= 150:
+                self.counter_image = 4
+                self.image = pygame.image.load(f"img/jumpscare{self.counter_image}.png")
+                screen.blit(self.image, (self.x, self.y))
+            elif self.counter <= 250 and self.counter >= 200:
+                self.counter_image = 5
+                self.image = pygame.image.load(f"img/jumpscare{self.counter_image}.png")
+                screen.blit(self.image, (self.x, self.y))
+            elif self.counter <= 300 and self.counter >= 250:
+                self.counter_image = 6
+                self.image = pygame.image.load(f"img/jumpscare{self.counter_image}.png")
+                screen.blit(self.image, (self.x, self.y))
+
+
+    def draw(self):
+        screen.blit(self.image, (self.x, self.y))
+
+class Text(pygame.sprite.Sprite):
+     def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.x = x
+        self.y = y
+        self.image = pygame.image.load("img/text box image.png")
+        self.timer = 1000
+
+     def text(self):
+        global pres_col
+        screen.blit(self.image, (self.x, self.y))
+        key = pygame.key.get_pressed()
+        global fn_c, fn, fn_c_, fn_, fn_c_2, fn_2, axe_col, bed_col, have_key, furn_col, fa, jum
+        fn_c += 1
+        if fn == 0:
+            fn_c += 1
+            e = draw_text("(N) Hello", font30, grey, 300, 800)
+            if fn_c > 200:
+                fn = 1
+                screen.blit(self.image, (self.x, self.y))
+
+        if fn == 1:
+            fn_c += 1
+            e = draw_text("(You) hey", font30, grey, 300, 800)
+            if fn_c > 400:
+                fn = 2
+
+        if fn == 2:
+            fn_c += 1
+            e = draw_text("(N) ...", font30, grey, 300, 800)
+            if fn_c > 600:
+                fn = 3
+                screen.blit(self.image, (self.x, self.y))
+
+        if fn == 3:
+            fn_c += 1
+            e = draw_text("", font30, grey, 300, 800)
+            if fn_c > 800:
+                fn = 4
+                screen.blit(self.image, (self.x, self.y))
+
+        if fn == 4:
+            fn_c += 1
+            e = draw_text("", font30, grey, 300, 800)
+            e = draw_text("", font30, grey, 300, 835)
+            if fn_c > 1200:
+                fn = 5
+                screen.blit(self.image, (self.x, self.y))
+
+        if fn == 5:
+            fn_c += 1
+            e = draw_text("", font30, grey, 300, 800)
+            if fn_c > 1400:
+                fn = 6
+                screen.blit(self.image, (self.x, self.y))
+
+        if pres_col == True:
+            fn_c_ += 1
+            e = draw_text("(N) key found", font30, grey, 300, 800)
+            if fn_c_ > 200:
+                have_key = True
+                fn_ = 6
+                screen.blit(self.image, (self.x, self.y))
+                pres_col = False
+                fn_c_ = 0
+
+        if axe_col == True:
+            fn_c_ += 1
+            e = draw_text("(N) axe found", font30, grey, 300, 800)
+            if fn_c_ > 200:
+                axe_col = False
+                fn_ = 6
+                screen.blit(self.image, (self.x, self.y))
+                axe_col = False
+                fn_c_ = 0
+
+        if bed_col == True:
+            fn_c_ += 1
+            e = draw_text("(N) h to hide", font30, grey, 300, 800)
+            if key[pygame.K_h]:
+                player.draw()
+                bed.draw()
+
+            if fn_c_ > 200:
+                bed_col = False
+                fn_ = 6
+                screen.blit(self.image, (self.x, self.y))
+                fn_c_ = 0
+
+        if furn_col == True and have_wood == False and have_chicken == False:
+            fn_c_ += 1
+            e = draw_text("(N) 0/2 objects found", font30, grey, 300, 800)
+
+
+            if fn_c_ > 200:
+                fn_ = 6
+                screen.blit(self.image, (self.x, self.y))
+                fn_c_ = 0
+                furn_col = False
+
+
+        if furn_col == True and ((have_wood == True and have_chicken == False) or (have_wood == False and have_chicken == True)):
+            fn_c_ += 1
+            e = draw_text("(N) 1/2 objects found", font30, grey, 300, 800)
+
+            if fn_c_ > 200:
+                fn_ = 6
+                screen.blit(self.image, (self.x, self.y))
+                fn_c_ = 0
+                furn_col = False
+
+        if furn_col == True and have_wood == True and have_chicken == True:
+            fn_c_2 += 1
+            e = draw_text("(N) 2/2 objects found", font30, grey, 300, 800)
+            fa.image = pygame.image.load("img/furnace2.png")
+
+            if fn_c_2 > 200:
+                fn_2 = 1000
+                screen.blit(self.image, (self.x, self.y))
+                fn_c_2 = 0
+                furn_col = False
+                fa.image = pygame.image.load("img/furnace2.png")
+                fire_place.play()
+
+        if fn_2 == 1000:
+                self.timer -= 1
+                print(self.timer)
+                e = draw_text(f"(N) food is ready in {self.timer}", font30, grey, 300, 800)
+
+                if self.timer < 800:
+                    jum = True
+
+
+class Player(pygame.sprite.Sprite):
+    def __init__(self, x, y, speed, a_speed):
+        pygame.sprite.Sprite.__init__(self)
+        global image
+        self.speed = speed
+        self.x = x
+        self.y = y
+        self.direction = True or False
+        self.x = 500
+        self.y = 500
+        self.a_speed = a_speed
+        self.counter = 0
+        self.counter_image = 1
+        self.counterr = 0
+        self.counter_imager = 1
+        self.image = pygame.image.load(f"img/sans{self.counter_image}.png")
+        self.rect = self.image.get_rect()
+
+        self.rect.center = [self.x, self.y]
+
+
+
+
+
+    def move(self):
+        global allowed_to_mover, allowed_to_movel, allowed_to_moveu, allowed_to_moved
+
+        key = pygame.key.get_pressed()
+        if key[pygame.K_a] and allowed_to_movel == True:
+            allowed_to_mover = True
+            self.x -= self.speed
+            self.direction = False
+            if self.direction == False:
+                self.counter += self.a_speed
+                if self.counter <= 50 and self.counter >= 0:
+                    self.counter_image = 1
+                    self.image = pygame.image.load(f"img/sans{self.counter_image}.png")
+                    self.image = pygame.transform.flip(self.image, True, False)
+                elif self.counter <= 100 and self.counter >= 50:
+                    self.counter_image = 2
+                    self.image = pygame.image.load(f"img/sans{self.counter_image}.png")
+                    self.image = pygame.transform.flip(self.image, True, False)
+                if self.counter > 100:
+                    self.counter = 0
+                    step_wood_place.play()
+
+
+
+            self.rect = self.image.get_rect()
+
+            self.rect.center = [self.x, self.y]
+
+        elif key[pygame.K_d] and allowed_to_mover == True:
+            self.x += self.speed
+            self.direction = True
+            if self.direction == True:
+                self.counter += self.a_speed
+                if self.counter <= 50 and self.counter >= 0:
+                    self.counter_image = 1
+                    self.image = pygame.image.load(f"img/sans{self.counter_image}.png")
+                elif self.counter <= 100 and self.counter >= 50:
+                    self.counter_image = 2
+                    self.image = pygame.image.load(f"img/sans{self.counter_image}.png")
+                if self.counter > 100:
+                    self.counter = 0
+                    step_wood_place.play()
+
+
+
+            self.rect = self.image.get_rect()
+            self.rect.center = [self.x, self.y]
+
+        elif key[pygame.K_w] and allowed_to_moveu == True:
+            allowed_to_moved = True
+            self.y -= self.speed
+            self.direction = True
+            if self.direction == True:
+                self.counter += self.a_speed
+                if self.counter <= 50 and self.counter >= 0:
+                    self.counter_image = 1
+                    self.image = pygame.image.load(f"img/sansu{self.counter_image}.png")
+                elif self.counter <= 100 and self.counter >= 50:
+                    self.counter_image = 2
+                    self.image = pygame.image.load(f"img/sansu{self.counter_image}.png")
+                elif self.counter <= 150 and self.counter >= 100:
+                    self.counter_image = 3
+                    self.image = pygame.image.load(f"img/sansu{self.counter_image}.png")
+                if self.counter > 150:
+                    self.counter = 0
+                    step_wood_place.play()
+
+
+            self.rect = self.image.get_rect()
+
+            self.rect.center = [self.x, self.y]
+
+        elif key[pygame.K_s] and allowed_to_moved == True:
+            allowed_to_moveu = True
+            self.y += self.speed
+            self.direction = True
+            if self.direction == True:
+                self.counter += self.a_speed
+                if self.counter <= 50 and self.counter >= 0:
+                    self.counter_image = 1
+                    self.image = pygame.image.load(f"img/sansd{self.counter_image}.png")
+                elif self.counter <= 100 and self.counter >= 50:
+                    self.counter_image = 2
+                    self.image = pygame.image.load(f"img/sansd{self.counter_image}.png")
+                elif self.counter <= 150 and self.counter >= 100:
+                    self.counter_image = 3
+                    self.image = pygame.image.load(f"img/sansd{self.counter_image}.png")
+                if self.counter > 150:
+                    self.counter = 0
+                    step_wood_place.play()
+
+            self.rect = self.image.get_rect()
+
+            self.rect.center = [self.x, self.y]
+
+        self.rect = self.image.get_rect()
+
+        self.rect.center = [self.x, self.y]
+
+    def draw(self):
+        screen.blit(self.image, (self.x, self.y))
+        self.rect = self.image.get_rect()
+
+        self.rect.center = [self.x, self.y]
+
+e = 0
+
+class Wall(pygame.sprite.Sprite):
+    def __init__(self, x, y, width, height):
+        pygame.sprite.Sprite.__init__(self)
+        self.x = x
+        self.y = y
+        self.image = pygame.image.load("img/wall.png")
+        self.rect = self.image.get_rect()
+
+    def draw(self):
+        screen.blit(self.image, self.rect)
+
+class CookingArea(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.x = x
+        self.y = y
+        self.image = pygame.image.load("img/furnace.png")
+        self.rect = self.image.get_rect()
+        self.rect.center = [self.x, self.y]
+
+
+    def draw(self):
+        screen.blit(self.image, (self.x, self.y))
+
+
+fa = CookingArea(0, 175)
+table = Table(685, 350)
+text_box = Text(250, 720)
+chair = Chair(700, 250)
+floor = FloorPlanks(0, 0)
+bed = Bed(800, 0)
+lamp = Lamp(750, 0)
+lamp2 = Lamp(900, 0)
+grass = Grass(0, 0)
+tree = Tree(200, 350)
+freezer = Fridge(500, 50)
+js = JumpScare(0, 0, 25)
+
+player_group = pygame.sprite.Group()
+
+player = Player(500, 500, 7, 7)
+player_group.add(player)
+wall = Wall(0, 0, 1000, 300)
+chair_group = pygame.sprite.Group()
+chair_group.add(chair)
+player_group = pygame.sprite.Group()
+player_group.add(player)
+wood_w = Wood_cutter(100, 500)
+
+# player.rect.x <= table.rect.left + 10 and player.rect.x >= table.rect.left - 10
+running = True
+while running:
+
+    if jum == True:
+        print("yay")
+        js.draw()
+        js.update()
+        js.draw()
+
+    if player.rect.left > 1000 and not e_w == 1:
+        e_w += 1
+        player.x = 0
+
+    if player.rect.right < 0 and not e_w == 0:
+        e_w -= 1
+        player.x = 950
+
+    if player.rect.top > 1000 and not n_s== 2:
+        n_s += 1
+        player.y = 0
+
+    if player.rect.bottom < 0 and not n_s == 0:
+        n_s -= 1
+        player.y = 900
+
+    screen.fill((200, 200, 200))
+
+    if e_w == 0 and n_s == 0:
+        floor.draw()
+        wall.draw()
+        fa.draw()
+        chair.draw()
+        chair.update()
+        clock.tick(fps)
+        chair_group.update()
+
+        if player.rect.colliderect(fa):
+            print("yyaayy")
+            furn_col = True
+
+        if player.rect.colliderect(chair):
+            player.x, player.y = 700, 250
+            player.image = pygame.image.load(f"img/sansd2.png")
+            e += 1
+            if e > 50:
+                sit_place.play()
+                player.x, player.y = 700, 350
+                e = 0
+
+
+
+        if player.rect.y == 201:
+           allowed_to_moveu = False
+
+    if e_w == 1 and n_s == 0:
+        floor.draw()
+        wall.draw()
+
+        couch = Couch(650, 500)
+        couch.draw()
+
+        if player.rect.colliderect(couch):
+            player.x, player.y = couch.x + 70, couch.y
+            player.image = pygame.image.load(f"img/sansd2.png")
+            e += 1
+            if e > 50:
+                sit_place.play()
+                player.x, player.y = couch.x + 70, couch.y + 110
+                e = 0
+
+        if player.rect.y == 201:
+           allowed_to_moveu = False
+
+        presses = Presses(600, 120)
+        presses.draw()
+
+        if player.rect.colliderect(presses):
+            pres_col = True
+
+    if e_w == 0 and n_s == 1:
+
+
+        grass.draw()
+
+        wood_w.draw()
+
+        if player.rect.colliderect(wood_w):
+            wood_w.image = pygame.image.load("img/wood_without_axe.png")
+            axe_col = True
+
+    if e_w == 1 and n_s == 1:
+        floor.draw()
+        bed.draw()
+        lamp.draw()
+        lamp.update()
+        lamp2.draw()
+        lamp2.update()
+
+        if player.rect.colliderect(bed):
+            bed_col = True
+
+        if hide == False:
+            player.draw()
+
+    if e_w == 0 and n_s == 2:
+        grass.draw()
+        tree.update()
+        tree.draw()
+
+
+
+    if e_w == 1 and n_s == 2:
+        grass.draw()
+        freezer.update()
+        freezer.draw()
+
+
+
+
+
+
+
+
+
+
+
+
+    if hide == True:
+        player.draw()
+
+    if axe_col == True:
+        have_axe = True
+
+    if jum == True:
+        print("yay")
+        js.draw()
+        js.update()
+        js.draw()
+
+    text_box.text()
+    player.move()
+    clock.tick(fps)
+    key = pygame.key.get_pressed()
+
+
+
+
+
+
+
+
+
+
+
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+    pygame.display.update()
